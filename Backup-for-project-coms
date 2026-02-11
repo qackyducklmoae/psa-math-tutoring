@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Home | Schoology</title> <!-- Tab Mask -->
+    <link rel="icon" href="https://asset-cdn.schoology.com">
+    <style>
+        :root { --glow: #00ff88; --glass: rgba(10, 10, 10, 0.85); --border: rgba(0, 255, 136, 0.2); }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; background: #000; font-family: 'Segoe UI', sans-serif; overflow: hidden; color: white; }
+        
+        /* Matrix Background */
+        canvas { position: absolute; top: 0; left: 0; z-index: -1; filter: brightness(0.4); }
+
+        /* The Glass Container */
+        .glass-panel {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 90%; max-width: 1000px; height: 85vh;
+            background: var(--glass); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+            border: 1px solid var(--border); border-radius: 20px;
+            display: flex; flex-direction: column; align-items: center; padding: 25px; box-shadow: 0 0 50px rgba(0,0,0,1);
+        }
+
+        h1 { font-size: 38px; letter-spacing: 10px; background: linear-gradient(to right, #fff, var(--glow)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 10px 0; filter: drop-shadow(0 0 10px var(--glow)); }
+        
+        /* Categories & Grid */
+        .nav-tabs { display: flex; gap: 10px; margin-bottom: 20px; overflow-x: auto; width: 100%; padding: 10px; scrollbar-width: none; }
+        .tab-btn { background: rgba(255,255,255,0.05); color: white; border: 1px solid var(--border); padding: 8px 18px; border-radius: 20px; cursor: pointer; white-space: nowrap; transition: 0.3s; }
+        .tab-btn.active { background: var(--glow); color: black; font-weight: bold; }
+
+        .app-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(115px, 1fr)); gap: 15px; width: 100%; overflow-y: auto; padding: 10px; scrollbar-width: thin; scrollbar-color: var(--glow) transparent; }
+        .app-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); padding: 12px; border-radius: 12px; cursor: pointer; transition: 0.3s; text-align: center; }
+        .app-card:hover { background: var(--glow); color: black; transform: scale(1.05); box-shadow: 0 0 15px var(--glow); }
+        .app-card img { width: 42px; height: 42px; border-radius: 8px; margin-bottom: 8px; background: #222; }
+        .app-card span { display: block; font-size: 10px; font-weight: bold; text-transform: uppercase; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+        /* Logic Elements */
+        button.main-btn { background: transparent; color: var(--glow); border: 1px solid var(--glow); padding: 12px 30px; border-radius: 30px; cursor: pointer; margin: 10px; font-weight: bold; transition: 0.3s; }
+        button.main-btn:hover { background: var(--glow); color: black; box-shadow: 0 0 20px var(--glow); }
+        .hidden { display: none !important; }
+        input { background: transparent; border: 1px solid var(--glow); color: white; padding: 15px; border-radius: 10px; width: 280px; text-align: center; outline: none; font-size: 18px; }
+    </style>
+</head>
+<body>
+
+<canvas id="canvas"></canvas>
+
+<!-- LOGIN GATE -->
+<div id="login-gate" class="glass-panel" style="height: auto;">
+    <h1>LOCKED</h1>
+    <p style="color: var(--glow); font-size: 12px; letter-spacing: 2px;">AUTHENTICATION REQUIRED</p>
+    <input type="password" id="pass" placeholder="TOKEN...">
+    <br><button class="main-btn" onclick="check()">INITIALIZE</button>
+</div>
+
+<!-- MAIN DASHBOARD -->
+<div id="dashboard" class="glass-panel hidden">
+    <h1 id="site-title">NOVA NODE</h1>
+    
+    <div class="nav-tabs" id="tabs">
+        <button class="tab-btn active" onclick="filterApps('All')">All</button>
+        <button class="tab-btn" onclick="filterApps('Games')">Games</button>
+        <button class="tab-btn" onclick="filterApps('Media')">Media</button>
+        <button class="tab-btn" onclick="filterApps('Dev')">Dev/Apps</button>
+        <button class="tab-btn" onclick="filterApps('Academic')">Academic</button>
+        <button class="tab-btn" onclick="filterApps('Proxies')">Proxies</button>
+    </div>
+
+    <div class="app-grid" id="grid"></div>
+</div>
+
+<script>
+    // --- MATRIX BG SCRIPT ---
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+    const letters = '01'; const fontSize = 14; const columns = canvas.width / fontSize;
+    const drops = Array(Math.floor(columns)).fill(1);
+    function draw() {
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.05)'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#00ff88'; ctx.font = fontSize + 'px monospace';
+        for (let i = 0; i < drops.length; i++) {
+            const text = letters.charAt(Math.floor(Math.random() * letters.length));
+            ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+            if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+            drops[i]++;
+        }
+    }
+    setInterval(draw, 35);
+
+    // --- SYSTEM CORE ---
+    const _0xPASS = "Desi6218!";
+    const _0xEXIT = "https://app.schoology.com";
+
+    const apps = [
+        // CATEGORY: Games
+        { n: "Radon Engine", u: "https://radon.games", c: "Games" },
+        { n: "Frogie Arcade", u: "https://frogiesarcade.dev", c: "Games" },
+        { n: "3kh0 Lite", u: "https://3kh0-lite.github.io", c: "Games" },
+        { n: "Minecraft", u: "https://eagle-network.github.io", c: "Games" },
+        { n: "Retro Bowl", u: "https://game316087.konggames.com", c: "Games" },
+        { n: "1v1.LOL", u: "https://1v1.lol", c: "Games" },
+        { n: "FNAF Uncut", u: "https://frogiesarcade.com", c: "Games" },
+        { n: "CS 1.6", u: "https://play-cs.com", c: "Games" },
+        { n: "Roblox App", u: "https://now.gg", c: "Games" },
+        { n: "Geometry Logic", u: "https://geometry-dash.co", c: "Games" },
+        { n: "Slope Mirror", u: "https://kdata1.com", c: "Games" },
+        { n: "Subway Surf", u: "https://poki.com", c: "Games" },
+        { n: "BitLife", u: "https://bitlifeonline.io", c: "Games" },
+        { n: "Drive Mad", u: "https://drive-mad.com", c: "Games" },
+        { n: "Shell Shock", u: "https://shellshock.io", c: "Games" },
+        { n: "Smash Karts", u: "https://smashkarts.io", c: "Games" },
+
+        // CATEGORY: Media
+        { n: "Tube-Node (YT)", u: "https://piped.video", c: "Media" },
+        { n: "Nick Archive", u: "https://www.nickelodeon.tv", c: "Media" },
+        { n: "Pluto TV", u: "https://pluto.tv", c: "Media" },
+        { n: "Movie Stream", u: "https://vidsrc.pm", c: "Media" },
+        { n: "FMovies", u: "https://fmovies.ps", c: "Media" },
+        { n: "SolarMovie", u: "https://solarmovie.pe", c: "Media" },
+        { n: "Spotify Clone", u: "https://spotify.com", c: "Media" },
+
+        // CATEGORY: Dev / Apps
+        { n: "Photopea (PS)", u: "https://www.photopea.com", c: "Dev" },
+        { n: "VS Code Web", u: "https://vscode.dev", c: "Dev" },
+        { n: "Discord Web", u: "https://discord-unblocked.github.io", c: "Dev" },
+        { n: "Replit", u: "https://replit.com", c: "Dev" },
+        { n: "Canva Design", u: "https://www.canva.com", c: "Dev" },
+        { n: "EmuOS", u: "https://emupedia.net", c: "Dev" },
+
+        // CATEGORY: Academic
+        { n: "Wayback Machine", u: "https://web.archive.org", c: "Academic" },
+        { n: "Wolfram Alpha", u: "https://www.wolframalpha.com", c: "Academic" },
+        { n: "Desmos", u: "https://www.desmos.com", c: "Academic" },
+        { n: "Khan Academy", u: "https://www.khanacademy.org", c: "Academic" },
+        { n: "Wikipedia", u: "https://en.wikipedia.org", c: "Academic" },
+
+        // CATEGORY: Proxies
+        { n: "BlockAway", u: "https://www.blockaway.net", c: "Proxies" },
+        { n: "Doge Proxy", u: "https://doge.unblocker.cc", c: "Proxies" },
+        { n: "Holy Proxy", u: "https://holy.unblocker.cc", c: "Proxies" },
+        { n: "Apache Tunnel", u: "https://apache.night.net", c: "Proxies" }
+    ];
+
+    function check() {
+        if (document.getElementById('pass').value === _0xPASS) {
+            document.getElementById('login-gate').classList.add('hidden');
+            document.getElementById('dashboard').classList.remove('hidden');
+            filterApps('All');
+        } else { window.location.replace("https://google.com"); }
+    }
+
+    function filterApps(category) {
+        const grid = document.getElementById('grid');
+        grid.innerHTML = '';
+        const filtered = category === 'All' ? apps : apps.filter(a => a.c === category);
+        
+        filtered.forEach(app => {
+            const div = document.createElement('div');
+            div.className = 'app-card';
+            div.innerHTML = `<img src="https://www.google.com{app.u}"><span>${app.n}</span>`;
+            div.onclick = () => launch(app.u);
+            grid.appendChild(div);
+        });
+
+        // Update active tab styling
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.innerText === category);
+        });
+    }
+
+    function launch(url) {
+        const win = window.open('about:blank', '_blank');
+        if (!win) return alert("System Warning: Allow Pop-ups for authentication!");
+        win.document.title = "Home | Schoology";
+        const icon = win.document.createElement('link'); icon.rel = 'icon'; icon.href = 'https://asset-cdn.schoology.com';
+        win.document.head.appendChild(icon);
+        const frame = win.document.createElement('iframe');
+        frame.style = "position:fixed; top:0; left:0; width:100%; height:100%; border:none; margin:0;";
+        frame.src = url; win.document.body.appendChild(frame);
+        
+        // Kill Switch Injection
+        setInterval(() => {
+            if (!win || win.closed) return;
+            win.onkeyup = (e) => { if (e.key === "=" || e.key === "`") win.location.replace(_0xEXIT); };
+        }, 500);
+        window.location.replace("https://google.com");
+    }
+
+    document.addEventListener('keyup', (e) => { if (e.key === "=" || e.key === "`") window.location.replace(_0xEXIT); });
+    document.addEventListener('contextmenu', e => e.preventDefault());
+</script>
+</body>
+</html>
+https://google.com
+"); }
+    }
+
+    function loadApps() {
+        const grid = document.getElementById('grid');
+        grid.innerHTML = '';
+        apps.forEach(app => {
+            const div = document.createElement('div');
+            div.className = 'app-card';
+            div.innerHTML = `<img src="
+https://www.google.com
+{app.u}"><span>${app.n}</span>`;
+            div.onclick = () => launch(app.u);
+            grid.appendChild(div);
+        });
+    }
+
+    function showApps() { document.getElementById('main-menu').classList.add('hidden'); document.getElementById('app-store').classList.remove('hidden'); }
+    function hideApps() { document.getElementById('app-store').classList.add('hidden'); document.getElementById('main-menu').classList.remove('hidden'); }
+
+    function launch(url) {
+        const win = window.open('about:blank', '_blank');
+        if (!win) return alert("System Warning: Allow Pop-ups for 'Schoology' to function.");
+        
+        win.document.title = "Home | Schoology";
+        const icon = win.document.createElement('link');
+        icon.rel = 'icon'; icon.href = 'https://asset-cdn.schoology.com';
+        win.document.head.appendChild(icon);
+
+        const frame = win.document.createElement('iframe');
+        frame.style = "position:fixed; top:0; left:0; width:100%; height:100%; border:none; margin:0;";
+        frame.src = url;
+        win.document.body.appendChild(frame);
+
+        setInterval(() => {
+            if (!win || win.closed) return;
+            win.onkeyup = (e) => { if (e.key === "=" || e.key === "`") win.location.replace(_0xEXIT); };
+        }, 500);
+
+        window.location.replace("
+https://google.com
+");
+    }
+
+    document.addEventListener('keyup', (e) => { if (e.key === "=" || e.key === "`") window.location.replace(_0xEXIT); });
+    document.addEventListener('contextmenu', e => e.preventDefault());
+</script>
+</body>
+</html>
