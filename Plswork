@@ -2,88 +2,113 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Home | Schoology</title> <!-- Tab Cloaking -->
+    <title>Home | Schoology</title> <!-- Tab Cloak -->
     <link rel="icon" href="https://asset-cdn.schoology.com">
     <style>
-        body { background: #0d1117; color: #c9d1d9; font-family: -apple-system, sans-serif; text-align: center; padding: 50px; }
-        .module-box { background: #161b22; border: 1px solid #30363d; padding: 25px; border-radius: 12px; display: inline-block; width: 320px; }
-        button { background: #238636; color: white; border: none; padding: 12px 20px; font-size: 15px; border-radius: 6px; cursor: pointer; margin: 8px; width: 90%; transition: 0.2s; }
-        button:hover { background: #2ea043; transform: translateY(-2px); }
+        body { background: #0d1117; color: #c9d1d9; font-family: sans-serif; text-align: center; padding: 50px; margin: 0; }
+        .container { background: #161b22; border: 1px solid #30363d; padding: 30px; border-radius: 12px; display: inline-block; width: 350px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        h1, h2 { color: #58a6ff; margin-bottom: 10px; }
+        button { background: #238636; color: white; border: none; padding: 12px; font-size: 16px; border-radius: 6px; cursor: pointer; margin: 8px; width: 90%; transition: 0.2s; font-weight: bold; }
+        button:hover { background: #2ea043; transform: scale(1.02); }
         .hidden { display: none; }
-        input { background: #010409; border: 1px solid #30363d; color: white; padding: 12px; border-radius: 6px; margin-bottom: 15px; width: 80%; }
+        input { background: #010409; border: 1px solid #30363d; color: white; padding: 12px; border-radius: 6px; margin-bottom: 15px; width: 85%; outline: none; }
+        p { color: #8b949e; font-size: 14px; }
     </style>
 </head>
 <body>
 
-<div id="login">
-    <div class="module-box">
-        <h2>Secure SSO Login</h2>
-        <p>Paragon Science Academy Portal</p>
-        <input type="password" id="access" placeholder="Student ID Password...">
-        <button onclick="auth()">Sign In</button>
+<!-- LOGIN SCREEN -->
+<div id="login-gate">
+    <div class="container">
+        <h1>EDUROCKS V3</h1>
+        <p>Paragon Science Academy - Student SSO</p>
+        <input type="password" id="pass" placeholder="Enter Access Code...">
+        <button onclick="check()">Sign In</button>
     </div>
 </div>
 
+<!-- GAME DASHBOARD -->
 <div id="dashboard" class="hidden">
-    <div class="module-box">
+    <div class="container">
         <h2>Assignment Modules</h2>
-        <p>EDURocks v3.0 - Academic Suite</p>
-        <button onclick="go(0)">Arithmetic Log (CoolMath)</button>
-        <button onclick="go(1)">Geo-Spatial Engine (3kh0)</button>
-        <button onclick="go(2)">Logic Repository (GN-Math)</button>
-        <button onclick="go(3)">Media Database (Movies)</button>
-        <button onclick="go(4)">Quantum Tunnel (Proxy)</button>
+        <p>Select a research tool to begin:</p>
+        <button onclick="launch(0)">Module A: 3kh0 Lite</button>
+        <button onclick="launch(1)">Module B: GN-Math</button>
+        <button onclick="launch(2)">Module C: CoolMath</button>
+        <button onclick="launch(3)">Module D: Media Player</button>
+        <button onclick="launch(4)">Module E: Web Proxy</button>
     </div>
 </div>
 
 <script>
-    // HEX ENCODED DATA - Unreadable by Scanners
+    // 1. DATA (Encoded to hide from GoGuardian)
     const _0xPASS = "Desi6218!";
+    const _0xEXIT = "https://app.schoology.com";
     const _0xURLS = [
-        'https://www.coolmathgames.com', // Module 0
-        'https://lite.3kh0.net',        // Module 1
-        'https://gn-math.github.io',    // Module 2
-        'https://vidsrc.me',            // Module 3
-        'https://www.blockaway.net'     // Module 4
+        'https://lite.3kh0.net',
+        'https://gn-math.github.io',
+        'https://www.coolmathgames.com',
+        'https://vidsrc.me',
+        'https://www.blockaway.net'
     ];
 
-    // PANIC KEYS: Press '=' or '`' to escape instantly
-    document.onkeydown = (e) => {
-        if (e.key === "=" || e.key === "`") window.location.replace("https://app.schoology.com");
-        if (e.keyCode == 123 || (e.ctrlKey && e.shiftKey && e.keyCode == 73)) return false; // Anti-Inspect
-    };
+    // 2. PANIC KEY FOR MAIN DASHBOARD (= or `)
+    document.addEventListener('keyup', (e) => {
+        if (e.key === "=" || e.key === "`") window.location.replace(_0xEXIT);
+    });
 
-    function auth() {
-        if (document.getElementById('access').value === _0xPASS) {
-            document.getElementById('login').classList.add('hidden');
+    // 3. LOGIN CHECK
+    function check() {
+        const input = document.getElementById('pass').value;
+        if (input === _0xPASS) {
+            document.getElementById('login-gate').classList.add('hidden');
             document.getElementById('dashboard').classList.remove('hidden');
         } else {
-            window.location.replace("
-https://google.com
-");
+            window.location.replace("https://google.com");
         }
     }
 
-    function go(i) {
+    // 4. THE CLOAK LAUNCHER
+    function launch(index) {
+        const url = _0xURLS[index];
         const win = window.open('about:blank', '_blank');
+        
+        if (!win) {
+            alert("Please allow pop-ups for this assignment!");
+            return;
+        }
+
+        // TAB MASKING (Sets title and Schoology icon)
         win.document.title = "Home | Schoology";
         const icon = win.document.createElement('link');
         icon.rel = 'icon';
         icon.href = 'https://asset-cdn.schoology.com';
         win.document.head.appendChild(icon);
 
+        // CREATE GAME FRAME
         const frame = win.document.createElement('iframe');
-        frame.style = "position:fixed; top:0; left:0; width:100%; height:100%; border:none; margin:0;";
-        frame.src = _0xURLS[i];
+        frame.style = "position:fixed; top:0; left:0; width:100%; height:100%; border:none; margin:0; padding:0;";
+        frame.src = url;
         win.document.body.appendChild(frame);
 
-        win.addEventListener('keydown', (e) => {
-            if (e.key === "=" || e.key === "`") win.location.replace("https://app.schoology.com");
-        });
-        window.location.replace("
-https://google.com
-");
+        // PERSISTENT PANIC KEY (Runs every 0.5s so games can't block it)
+        setInterval(() => {
+            if (!win || win.closed) return;
+            win.onkeyup = (e) => {
+                if (e.key === "=" || e.key === "`") win.location.replace(_0xEXIT);
+            };
+        }, 500);
+
+        // HIDE EVIDENCE (Redirect original tab)
+        window.location.replace("https://google.com");
     }
+
+    // 5. ANTI-THEFT (Disable Right-Click and F12)
+    document.addEventListener('contextmenu', e => e.preventDefault());
+    document.onkeydown = (e) => {
+        if (e.keyCode == 123 || (e.ctrlKey && e.shiftKey && e.keyCode == 73)) return false;
+    };
 </script>
+
 </body>
 </html>
