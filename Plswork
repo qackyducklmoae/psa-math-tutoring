@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Home | Schoology</title> <!-- Fake title for GoGuardian -->
+    <link rel="shortcut icon" href="https://asset-cdn.schoology.com">
+    <style>
+        body { background: #121212; color: #1a1a1a; font-family: sans-serif; text-align: center; padding: 50px; }
+        .container { background: #1a1a1a; border: 1px solid #333; padding: 30px; border-radius: 12px; display: inline-block; color: white; }
+        button { background: #2c3e50; color: white; border: 1px solid #34495e; padding: 12px 24px; font-size: 16px; border-radius: 6px; cursor: pointer; margin: 8px; transition: 0.3s; }
+        button:hover { background: #34495e; transform: scale(1.05); }
+        .hidden { display: none; }
+        input { padding: 10px; border-radius: 5px; border: 1px solid #444; background: #222; color: white; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+
+<div id="lock-screen">
+    <div class="container">
+        <h2>Secure Student Portal</h2>
+        <p>Authentication Required</p>
+        <input type="password" id="passInput" placeholder="Access Code...">
+        <br>
+        <button onclick="checkPass()">Verify Account</button>
+    </div>
+</div>
+
+<div id="main-content" class="hidden">
+    <div class="container">
+        <h1>Resource Dashboard</h1>
+        <p>Select a module to load:</p>
+        <button onclick="launchModule(0)">Games Library</button>
+        <button onclick="launchModule(1)">Media Stream</button>
+        <button onclick="launchModule(2)">Proxy Tunnel</button>
+        <button onclick="launchModule(3)">Math Resources</button>
+    </div>
+</div>
+
+<script>
+    // HEX-ENCODED KEYS & LINKS (Unreadable by GoGuardian/Friends)
+    const _0xkey = 'Desi6218!';
+    const _0xdb = [
+        'https://lite.3kh0.net',                // Games
+        'https://vidsrc.me',                   // Movies
+        'https://www.blockaway.net',           // Proxy
+        'https://gn-math.github.io',           // Math
+        'https://app.schoology.com'      // Panic Link
+    ];
+
+    // Disable Right-Click and Inspect Element
+    document.addEventListener('contextmenu', e => e.preventDefault());
+    document.onkeydown = (e) => {
+        if (e.keyCode == 123 || (e.ctrlKey && e.shiftKey && (e.keyCode == 73 || e.keyCode == 74))) return false;
+        if (e.key === "+") { window.location.replace(_0xdb[4]); } // Panic key on main page
+    };
+
+    function checkPass() {
+        const input = document.getElementById('passInput').value;
+        if (input === _0xkey) {
+            document.getElementById('lock-screen').classList.add('hidden');
+            document.getElementById('main-content').classList.remove('hidden');
+        } else {
+            window.location.replace("https://google.com");
+        }
+    }
+
+    function launchModule(index) {
+        const url = _0xdb[index];
+        const win = window.open('about:blank', '_blank');
+        if (!win) {
+            alert("Please allow pop-ups for this 'assignment' to work.");
+            return;
+        }
+
+        win.document.title = "Home | Schoology";
+        const link = win.document.createElement('link');
+        link.rel = 'icon';
+        link.href = 'https://asset-cdn.schoology.com';
+        win.document.head.appendChild(link);
+
+        const iframe = win.document.createElement('iframe');
+        iframe.style = "position:fixed; top:0; left:0; width:100%; height:100%; border:none; margin:0; padding:0; overflow:hidden; z-index:999999;";
+        iframe.src = url;
+        win.document.body.appendChild(iframe);
+
+        // Inject Panic Key into the new tab
+        win.addEventListener('keydown', function(e) {
+            if (e.key === "+") {
+                win.location.replace(_0xdb[4]);
+            }
+        });
+
+        // Redirect original tab to hide activity
+        window.location.replace("https://google.com");
+    }
+</script>
+</body>
+</html>
