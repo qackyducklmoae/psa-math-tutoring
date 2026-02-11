@@ -1,1 +1,8 @@
 # psa-math-tutoring
+
+DOWNLOAD AS A ZIP FOR BOTH VERSIONS. 
+
+
+
+
+TS BETTER WORkKKK
