@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home | Schoology</title>
+    <style>
+        :root {
+            --glow: #00ff88;
+            --bg: #050505;
+            --glass: rgba(10, 10, 10, 0.85);
+            --border: rgba(255, 255, 255, 0.1);
+            --font-main: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        * { box-sizing: border-box; transition: all 0.3s ease; }
+        body, html { 
+            margin: 0; padding: 0; width: 100%; height: 100%; 
+            background: var(--bg); color: white; 
+            font-family: var(--font-main); overflow: hidden; 
+        }
+
+        canvas { position: fixed; top: 0; left: 0; z-index: -1; filter: brightness(0.5); }
+
+        /* --- UI COMPONENTS --- */
+        .glass-panel {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 90%; max-width: 1100px; height: 85vh;
+            background: var(--glass); backdrop-filter: blur(20px);
+            border: 1px solid var(--border); border-radius: 20px;
+            display: flex; flex-direction: column; padding: 30px;
+            box-shadow: 0 0 50px rgba(0,0,0,0.8); z-index: 10;
+        }
+
+        .hidden { display: none !important; }
+
+        /* --- HEADER & STATS --- */
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .node-title { 
+            font-size: 32px; letter-spacing: 8px; font-weight: bold;
+            background: linear-gradient(to right, #fff, var(--glow));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 10px var(--glow));
+        }
+        .stats { font-family: monospace; color: var(--glow); text-align: right; font-size: 14px; }
+
+        /* --- SEARCH & TABS --- */
+        .search-bar {
+            width: 100%; background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border); border-radius: 10px;
+            padding: 12px 20px; color: white; outline: none; margin-bottom: 20px;
+        }
+        .search-bar:focus { border-color: var(--glow); box-shadow: 0 0 15px var(--glow); }
+
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; }
+        .tab { 
+            padding: 8px 20px; border-radius: 20px; cursor: pointer; 
+            background: rgba(255,255,255,0.05); border: 1px solid var(--border); 
+        }
+        .tab.active { background: var(--glow); color: black; font-weight: bold; }
+
+        /* --- APP GRID --- */
+        .grid { 
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); 
+            gap: 20px; overflow-y: auto; padding-right: 10px;
+        }
+        .card {
+            background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+            border-radius: 15px; padding: 20px; text-align: center; cursor: pointer;
+        }
+        .card:hover { 
+            background: rgba(255,255,255,0.1); transform: translateY(-5px);
+            border-color: var(--glow); box-shadow: 0 10px 20px rgba(0,0,0,0.4);
+        }
+        .card img { width: 50px; height: 50px; border-radius: 10px; margin-bottom: 10px; }
+        .card span { display: block; font-size: 14px; font-weight: 500; }
+
+        /* --- SPOTIFY PLAYER --- */
+        #music-player {
+            position: fixed; bottom: 20px; left: 20px; width: 300px;
+            border-radius: 15px; overflow: hidden; z-index: 100;
+            border: 1px solid var(--border);
+        }
+
+        /* --- LOGIN GATE --- */
+        #login-gate { text-align: center; justify-content: center; }
+        .login-input { 
+            background: transparent; border: 1px solid var(--glow); 
+            padding: 15px; color: white; border-radius: 10px; 
+            width: 300px; text-align: center; font-size: 18px; margin-bottom: 20px;
+        }
+        .login-btn {
+            background: var(--glow); color: black; border: none;
+            padding: 15px 40px; border-radius: 30px; font-weight: bold; cursor: pointer;
+        }
+
+        /* --- SELF DESTRUCT --- */
+        .destruct-btn {
+            position: fixed; bottom: 20px; right: 20px; 
+            background: rgba(255,0,0,0.2); color: #ff4444;
+            border: 1px solid #ff4444; padding: 10px; border-radius: 10px;
+            cursor: pointer; font-family: monospace; font-size: 10px;
+        }
+        .destruct-btn:hover { background: #ff4444; color: white; }
+    </style>
+</head>
+<body>
+
+<canvas id="canvas"></canvas>
+
+<div id="login-gate" class="glass-panel">
+    <div class="node-title">NOVA NODE</div>
+    <p style="letter-spacing: 3px; color: var(--glow);">ENCRYPTION ACTIVE</p>
+    <input type="password" id="pass" class="login-input" placeholder="ENTER ACCESS TOKEN...">
+    <br>
+    <button class="login-btn" onclick="check()">INITIALIZE SYSTEM</button>
+</div>
+
+<div id="dashboard" class="glass-panel hidden">
+    <div class="header">
+        <div class="node-title">ZENITH</div>
+        <div class="stats" id="sys-stats">
+            TIME: 00:00:00<br>
+            BATT: 100%<br>
+            NODE: STABLE
+        </div>
+    </div>
+
+    <input type="text" id="search" class="search-bar" placeholder="SEARCH SECURE DATABASE..." onkeyup="search()">
+
+    <div class="tabs">
+        <div class="tab active" onclick="filter('All')">All</div>
+        <div class="tab" onclick="filter('Games')">Games</div>
+        <div class="tab" onclick="filter('Proxies')">Proxies</div>
+        <div class="tab" onclick="filter('Tools')">Tools</div>
+    </div>
+
+    <div class="grid" id="app-grid"></div>
+</div>
+
+<div id="music-player" class="hidden">
+    <iframe src="https://open.spotify.com/embed/playlist/37i9dQZF1DXcBWIGoYBM3M" width="100%" height="80" frameBorder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe>
+</div>
+
+<button class="destruct-btn hidden" id="destruct" onclick="selfDestruct()">TERMINATE SESSION</button>
+
+<script>
+    // --- SETTINGS & APPS ---
+    const _0xSECRET = "RGVzaTYyMTgh"; // Desi6218!
+    let strikes = 0;
+
+    const apps = [
+        { n: "Radon Engine", u: "https://radon.games", c: "Games" },
+        { n: "3kh0 Lite", u: "https://3kh0-lite.github.io", c: "Games" },
+        { n: "1v1.LOL", u: "https://1v1.lol", c: "Games" },
+        { n: "Poki Arcade", u: "https://poki.com", c: "Games" },
+        { n: "Slope", u: "https://kdata1.com/2020/05/slope/", c: "Games" },
+        { n: "Retro Bowl", u: "https://game316087.konggames.com", c: "Games" },
+        { n: "BlockAway", u: "https://www.blockaway.net", c: "Proxies" },
+        { n: "Doge Proxy", u: "https://doge.unblocker.cc", c: "Proxies" },
+        { n: "Interstellar", u: "https://gointerstellar.app", c: "Proxies" },
+        { n: "Wolfram Alpha", u: "https://www.wolframalpha.com", c: "Tools" },
+        { n: "Photopea", u: "https://www.photopea.com", c: "Tools" },
+        { n: "VS Code Web", u: "https://vscode.dev", c: "Tools" }
+    ];
+
+    // --- SYSTEM CORE ---
+    function check() {
+        const val = document.getElementById('pass').value;
+        if (window.btoa(val) === _0xSECRET) {
+            document.getElementById('login-gate').classList.add('hidden');
+            document.getElementById('dashboard').classList.remove('hidden');
+            document.getElementById('music-player').classList.remove('hidden');
+            document.getElementById('destruct').classList.remove('hidden');
+            render('All');
+        } else {
+            strikes++;
+            if (strikes >= 3) triggerBSOD();
+            else alert("ACCESS DENIED: Attempt " + strikes + "/3");
+        }
+    }
+
+    function render(cat) {
+        const grid = document.getElementById('app-grid');
+        grid.innerHTML = '';
+        const filtered = cat === 'All' ? apps : apps.filter(a => a.c === cat);
+        
+        filtered.forEach(app => {
+            const icon = `https://www.google.com/s2/favicons?sz=64&domain=${new URL(app.u).hostname}`;
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.innerHTML = `<img src="${icon}"><span>${app.n}</span>`;
+            card.onclick = () => launch(app.u);
+            grid.appendChild(card);
+        });
+    }
+
+    // --- UNSTOPPABLE CLOAK ---
+    function launch(url) {
+        const win = window.open('about:blank', '_blank');
+        const doc = win.document;
+        doc.title = "Home | Schoology";
+        const link = doc.createElement('link');
+        link.rel = 'icon'; link.href = 'https://asset-cdn.schoology.com/favicon.ico';
+        doc.head.appendChild(link);
+
+        const frame = doc.createElement('iframe');
+        frame.style = "position:fixed;top:0;left:0;width:100%;height:100%;border:none;margin:0;";
+        frame.src = url;
+        doc.body.appendChild(frame);
+        
+        // Panic Switch inside the tab
+        win.addEventListener('keydown', (e) => {
+            if(e.key === 'Escape') win.location.replace("https://app.schoology.com");
+        });
+    }
+
+    // --- PRANKS & SECURITY ---
+    function triggerBSOD() {
+        document.body.innerHTML = `<div style="background:#0078d7;color:white;height:100vh;padding:10vw;font-family:sans-serif;cursor:none;">
+            <div style="font-size:100px">:(</div>
+            <h2>Your PC ran into a problem and needs to restart.</h2>
+            <p id="perc">0% complete</p>
+        </div>`;
+        let p = 0;
+        const itv = setInterval(() => {
+            p += Math.floor(Math.random()*7);
+            if(p>=100) { clearInterval(itv); window.location.href="https://www.youtube.com/watch?v=dQw4w9WgXcQ"; }
+            document.getElementById('perc').innerText = p + "% complete";
+        }, 400);
+    }
+
+    function selfDestruct() {
+        // "Clears" the UI and leaves
+        document.body.innerHTML = "<div style='color:red; font-family:monospace; padding:50px;'>TERMINATING SESSION... CACHE PURGED.</div>";
+        setTimeout(() => { window.location.replace("https://google.com"); }, 1500);
+    }
+
+    // --- UTILS ---
+    function search() {
+        const q = document.getElementById('search').value.toLowerCase();
+        document.querySelectorAll('.card').forEach(c => {
+            c.style.display = c.innerText.toLowerCase().includes(q) ? "block" : "none";
+        });
+    }
+
+    function filter(cat) {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        event.target.classList.add('active');
+        render(cat);
+    }
+
+    // Live Stats
+    setInterval(() => {
+        const now = new Date();
+        const clock = now.toLocaleTimeString();
+        document.getElementById('sys-stats').innerHTML = `TIME: ${clock}<br>NODE: STABLE<br>CLOAK: ACTIVE`;
+    }, 1000);
+
+    // Panic Key
+    document.addEventListener('keydown', (e) => { if(e.key.toLowerCase() === 'p') triggerBSOD(); });
+
+    // --- MATRIX BACKGROUND ---
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+    const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()*&^%";
+    const fontSize = 14;
+    const columns = canvas.width / fontSize;
+    const drops = Array.from({ length: columns }).fill(1);
+
+    function drawMatrix() {
+        ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = "#00ff88"; 
+        ctx.font = fontSize + "px monospace";
+        drops.forEach((y, i) => {
+            const text = letters[Math.floor(Math.random() * letters.length)];
+            ctx.fillText(text, i * fontSize, y * fontSize);
+            if (y * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+            drops[i]++;
+        });
+    }
+    setInterval(drawMatrix, 35);
+</script>
+</body>
+</html>
