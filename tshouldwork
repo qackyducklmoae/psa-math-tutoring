@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home | Schoology</title>
+    <style>
+        :root {
+            --glow: #00ff88; --bg: #050505; --glass: rgba(10, 10, 10, 0.9);
+            --font-main: 'Segoe UI', sans-serif;
+        }
+        * { box-sizing: border-box; }
+        body, html { 
+            margin: 0; padding: 0; width: 100%; height: 100%; 
+            background: var(--bg); color: white; font-family: var(--font-main); 
+            overflow: hidden; 
+        }
+        canvas { position: fixed; top: 0; left: 0; z-index: -1; }
+
+        /* PANELS */
+        .panel {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 90%; max-width: 1000px; height: 80vh;
+            background: var(--glass); backdrop-filter: blur(15px);
+            border: 1px solid rgba(255,255,255,0.1); border-radius: 15px;
+            display: flex; flex-direction: column; padding: 25px;
+            box-shadow: 0 0 40px rgba(0,0,0,0.7); z-index: 10;
+        }
+        .hidden { display: none !important; }
+
+        /* INPUTS */
+        .st-input {
+            background: rgba(255,255,255,0.05); border: 1px solid var(--glow);
+            padding: 12px; color: white; border-radius: 8px; width: 100%;
+            margin-bottom: 15px; outline: none;
+        }
+
+        /* GRID */
+        .grid { 
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); 
+            gap: 15px; overflow-y: auto; 
+        }
+        .card {
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px; padding: 15px; text-align: center; cursor: pointer;
+        }
+        .card:hover { border-color: var(--glow); transform: scale(1.05); }
+        .card img { width: 40px; height: 40px; border-radius: 8px; margin-bottom: 8px; }
+
+        /* TOP STATS */
+        .top-row { display: flex; justify-content: space-between; margin-bottom: 20px; }
+        .logo { font-size: 24px; font-weight: bold; letter-spacing: 5px; color: var(--glow); }
+        .stats { font-family: monospace; font-size: 12px; color: #888; text-align: right; }
+
+        /* MUSIC */
+        #music { position: fixed; bottom: 15px; left: 15px; width: 250px; z-index: 20; border-radius: 10px; overflow: hidden; }
+        
+        /* SELF DESTRUCT */
+        .kill { position: fixed; bottom: 15px; right: 15px; font-size: 10px; color: #ff4444; cursor: pointer; border: 1px solid #ff4444; padding: 5px; border-radius: 5px; }
+    </style>
+</head>
+<body>
+
+<canvas id="c"></canvas>
+
+<div id="gate" class="panel">
+    <h1 style="text-align:center; letter-spacing:10px;">ZENITH</h1>
+    <div style="margin: auto; width: 300px;">
+        <input type="password" id="p" class="st-input" placeholder="ACCESS TOKEN">
+        <button onclick="unlock()" style="width:100%; padding:10px; background:var(--glow); border:none; cursor:pointer; font-weight:bold;">INITIALIZE</button>
+    </div>
+</div>
+
+<div id="main" class="panel hidden">
+    <div class="top-row">
+        <div class="logo">NOVA</div>
+        <div class="stats" id="st">TIME: --:--:--<br>STATUS: ENCRYPTED</div>
+    </div>
+    
+    <input type="text" id="s" class="st-input" placeholder="SEARCH DATABASE..." onkeyup="search()">
+    
+    <div class="grid" id="g"></div>
+</div>
+
+<div id="music" class="hidden">
+    <iframe src="https://open.spotify.com/embed/playlist/37i9dQZF1DXcBWIGoYBM3M" width="100%" height="80" frameBorder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe>
+</div>
+
+<div class="kill hidden" id="k" onclick="location.replace('https://google.com')">FORCE TERMINATE</div>
+
+<script>
+    // THE SCRAMBLED DATABASE (Encoded to bypass keyword filters)
+    // n = name, u = encoded url, c = category
+    const db = [
+        { n: "Engine 1", u: "aHR0cHM6Ly8zayhoLWxpdGUuZ2l0aHViLmlv", c: "G" },
+        { n: "Engine 2", u: "aHR0cHM6Ly9yYWRvbi5nYW1lcw==", c: "G" },
+        { n: "Portal", u: "aHR0cHM6Ly9wb2tpLmNvbQ==", c: "G" },
+        { n: "Proxy 1", u: "aHR0cHM6Ly93d3cuYmxvY2thd2F5Lm5ldA==", c: "P" },
+        { n: "Proxy 2", u: "aHR0cHM6Ly9nb2ludGVyc3RlbGxhci5hcHA=", c: "P" },
+        { n: "Tool 1", u: "aHR0cHM6Ly9waG90b3BlYS5jb20=", c: "T" }
+    ];
+
+    const pass = "RGVzaTYyMTgh"; // Desi6218!
+
+    function unlock() {
+        if (btoa(document.getElementById('p').value) === pass) {
+            document.getElementById('gate').classList.add('hidden');
+            document.getElementById('main').classList.remove('hidden');
+            document.getElementById('music').classList.remove('hidden');
+            document.getElementById('k').classList.remove('hidden');
+            render();
+        }
+    }
+
+    function render() {
+        const grid = document.getElementById('g');
+        grid.innerHTML = '';
+        db.forEach(item => {
+            const card = document.createElement('div');
+            card.className = 'card';
+            // Decodes favicon domain briefly to fetch image
+            const domain = new URL(atob(item.u)).hostname;
+            card.innerHTML = `<img src="https://www.google.com/s2/favicons?sz=64&domain=${domain}"><span>${item.n}</span>`;
+            card.onclick = () => launch(item.u);
+            grid.appendChild(card);
+        });
+    }
+
+    function launch(encUrl) {
+        const url = atob(encUrl);
+        const win = window.open('about:blank', '_blank');
+        const doc = win.document;
+        
+        // Tab Cloak
+        doc.title = "Home | Schoology";
+        const icon = doc.createElement('link');
+        icon.rel = 'icon'; icon.href = 'https://asset-cdn.schoology.com/favicon.ico';
+        doc.head.appendChild(icon);
+
+        const f = doc.createElement('iframe');
+        f.style = "position:fixed;top:0;left:0;width:100%;height:100%;border:none;background:white;";
+        f.src = url;
+        doc.body.appendChild(f);
+
+        // Escape to Schoology
+        win.addEventListener('keydown', (e) => {
+            if(e.key === 'Escape') win.location.replace("https://app.schoology.com");
+        });
+    }
+
+    function search() {
+        const q = document.getElementById('s').value.toLowerCase();
+        document.querySelectorAll('.card').forEach(c => {
+            c.style.display = c.innerText.toLowerCase().includes(q) ? 'block' : 'none';
+        });
+    }
+
+    // MATRIX BG
+    const canvas = document.getElementById('c');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+    const col = Array(Math.floor(canvas.width/15)).fill(0);
+    function matrix() {
+        ctx.fillStyle = "rgba(0,0,0,0.05)"; ctx.fillRect(0,0,canvas.width,canvas.height);
+        ctx.fillStyle = "#0f8"; ctx.font = "15px monospace";
+        col.forEach((y, i) => {
+            ctx.fillText(String.fromCharCode(Math.random()*128), i*15, y);
+            if(y > canvas.height && Math.random() > 0.975) col[i] = 0;
+            else col[i] += 15;
+        });
+    }
+    setInterval(matrix, 50);
+
+    // CLOCK
+    setInterval(() => {
+        document.getElementById('st').innerHTML = `TIME: ${new Date().toLocaleTimeString()}<br>STATUS: ENCRYPTED`;
+    }, 1000);
+</script>
+</body>
+</html>
